@@ -20,13 +20,10 @@ int main(void) {
         printf("Digite a semente de geração randômica: ");
         scanf("%d", &semente);
 
-        // Gera arquivo com inteiros aleatórios
         criaArquivo(nomeArquivo, quantidade, semente);
 
-        // Cria árvore 2-3-4 a partir do arquivo
-        BTree *arvore234 = alocaBTree(2);  // grau mínimo 2 (2-3-4)
-
-        resetarMetricas(); // Zera contadores de splits e nós
+        BTree *arvore234 = alocaBTree(2);
+        resetarMetricas();
 
         FILE *arquivo = fopen(nomeArquivo, "r");
         if (!arquivo) {
@@ -43,17 +40,20 @@ int main(void) {
         printf("\n--- Árvore 2-3-4 criada com sucesso! ---\n");
         imprimeBTree(arvore234);
 
-        // Calcula estatísticas e salva no CSV
-        int splits = contarSplits(arvore234);
-        int altura = calcularAltura(arvore234);
-        int blocos = contarNos(arvore234);
-        salvarEstatisticasInsercao("estatisticas_insercao.csv", quantidade, splits, altura, blocos);
+        EstatisticasBTree estat;
+        estat.splits = contarSplits(arvore234);
+        estat.merges = 0; // nenhuma remoção ainda
+        estat.altura = calcularAltura(arvore234);
+        estat.blocos = contarNos(arvore234);
+        estat.percentualRemocao = 0;
+
+        salvarEstatisticasInsercao("estatisticas_insercao.csv", quantidade, &estat);
 
         int opMenu1;
         do {
             printf("\n--- MENU ÁRVORE 2-3-4 ---\n");
             printf("1 - Inserir novo elemento\n");
-            printf("2 - Remover elemento\n");
+            printf("2 - Remover elementos por porcentagem\n");
             printf("3 - Imprimir árvore\n");
             printf("4 - Converter em árvore rubro-negra\n");
             printf("5 - Gerar novo arquivo (voltar ao início)\n");
@@ -67,18 +67,54 @@ int main(void) {
                 scanf("%d", &novo);
                 insereBTree(arvore234, novo);
 
+                estat.splits = contarSplits(arvore234);
+                estat.altura = calcularAltura(arvore234);
+                estat.blocos = contarNos(arvore234);
+                salvarEstatisticasInsercao("estatisticas_insercao.csv", quantidade, &estat);
+
             } else if (opMenu1 == 2) {
-                int rem;
-                printf("Digite o número a ser removido: ");
-                scanf("%d", &rem);
-                removeBTree(arvore234, rem);
+                float porcentagem;
+                printf("\nDigite a porcentagem de elementos a serem removidos da árvore (ex: 10 para 10%%): ");
+                scanf("%f", &porcentagem);
 
-                // Atualiza estatísticas após remoção 
-                int novaAltura = calcularAltura(arvore234);
-                int novosBlocos = contarNos(arvore234);
-                salvarEstatisticasRemocao("estatisticas_remocao.csv", 0, novaAltura, novosBlocos); // 0 = "remoção manual"
+                if (porcentagem <= 0 || porcentagem > 100) {
+                    printf("Porcentagem inválida.\n");
+                    continue;
+                }
 
-            } else if (opMenu1 == 3) {
+                int totalElementos = contarNos(arvore234);
+                int numRemocoes = (int)((porcentagem / 100.0f) * totalElementos);
+
+                int* elementos = (int*)malloc(totalElementos * sizeof(int));
+                if (!elementos) {
+                    printf("Erro ao alocar memória.\n");
+                    continue;
+                }
+
+                int totalColetados = coletaElementosBTree(arvore234, elementos, totalElementos);
+
+                if (totalColetados < numRemocoes) {
+                    printf("Não há elementos suficientes para remover %.2f%%.\n", porcentagem);
+                    free(elementos);
+                    continue;
+                }
+
+                for (int i = 0; i < numRemocoes; i++) {
+                    removeBTree(arvore234, elementos[i]);
+                }
+
+                free(elementos);
+
+                estat.merges = contarMerges(); 
+                estat.altura = calcularAltura(arvore234);
+                estat.blocos = contarNos(arvore234);
+                estat.percentualRemocao = porcentagem;
+                salvarEstatisticasRemocao("estatisticas_remocao.csv", &estat);
+
+                printf("\nRemovidos %d elementos da árvore (%.2f%%).\n", numRemocoes, porcentagem);
+            }
+
+            else if (opMenu1 == 3) {
                 imprimeBTree(arvore234);
 
             } else if (opMenu1 == 4) {
@@ -113,9 +149,12 @@ int main(void) {
                         percorrePreOrdem(rubroNegra, retornaRaizRB(rubroNegra));
                     }
                 } while (opcaoRB != 4);
-            } else if (opMenu1 == 6) {
+            }
+
+            else if (opMenu1 == 6) {
                 programaRodando = 0;
             }
+
         } while (opMenu1 != 5 && opMenu1 != 6);
     }
 
