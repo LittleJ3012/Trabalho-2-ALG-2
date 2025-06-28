@@ -111,7 +111,7 @@ int main(void) {
                 programaRodando = 0; // Sai do loop para criar novo arquivo
             }
 
-        } while (opMenu1 != 5 && opMenu1 != 6);
+        } while (opMenu1 != 5);
 
         // ============================
         // ANÁLISE ESTATÍSTICA PÓS MENU
@@ -158,7 +158,8 @@ int main(void) {
         
     }
 
-    printf("\nPrograma encerrado. Obrigada por utilizar!\n");
+    printf("\nPrograma encerrado. Obrigado por utilizar!\n");
     return 0;
 }
+
 
