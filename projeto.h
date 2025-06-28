@@ -96,13 +96,28 @@ noRB *criaNoRB(RB *a, int chave);
 
 //Insere um novo nó na red black
 void insereArvoreRB(RB *a, noRB *no);
-void percorrePreOrdem(RB *a, noRB *no);
-void balanceaInsercao(RB *a, noRB *z);
-void balanceaRemocao(RB *a, noRB *y, noRB *pai);
-void rotacaoEsquerda(RB *a, noRB *noDesbalanceado);
-void rotacaoDireita(RB *a, noRB *noDesbalanceado);
-noRB *retornaRaizRB(RB *a);
+
+//Remove um elemento da árvore rubro negra
 void removeArvoreRB(RB *a, int chave);
+
+//Imprime a árvore em pré ordem
+void percorrePreOrdem(RB *a, noRB *no);
+
+//Realiza o balanceamento após uma inserção
+void balanceaInsercao(RB *a, noRB *z);
+
+//Realiza o balanceamento após uma remoção
+void balanceaRemocao(RB *a, noRB *y, noRB *pai);
+
+//Realiza uma rotação à esquerda
+void rotacaoEsquerda(RB *a, noRB *noDesbalanceado);
+
+//Realiza uma rotação à direita
+void rotacaoDireita(RB *a, noRB *noDesbalanceado);
+
+//Retorna a raiz da árvore rubro NEGRA
+noRB *retornaRaizRB(RB *a);
+
 
 
 
