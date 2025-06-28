@@ -15,6 +15,21 @@ struct BTree {
     int grauMinimo; 
 };
 
+struct EstatisticasBTree{
+    int splits;
+    int merges;
+    int altura;
+    int blocos;
+    float percentualRemocao;
+};
+
+
+struct EstatisticasRB{
+    int rotacoesEsq;
+    int rotacoesDir;
+    int altura;
+    int blocos;
+};
 
 int criaArquivo(char *nomeArquivo, int qtd, int semente){
     int num;
@@ -37,24 +52,26 @@ int criaArquivo(char *nomeArquivo, int qtd, int semente){
 }
 
 
-void salvarEstatisticasInsercao(char *nomeArquivo, int qtd, int splits, int altura, int blocos) {
-    FILE *fp = fopen(nomeArquivo, "a");
-    if (fp == NULL) {
-        printf("Erro ao salvar estatísticas.\n");
-        return;
+int coletaElementosBTreeRec(noBTree* no, int* vetor, int indice) {
+    if (no == NULL) return indice;
+
+    int i;
+    for (i = 0; i < no->numChaves; i++) {
+        if (!no->folha)
+            indice = coletaElementosBTreeRec(no->filhos[i], vetor, indice);
+        vetor[indice++] = no->chaves[i];
     }
-    fprintf(fp, "%d,%d,%d,%d\n", qtd, splits, altura, blocos);
-    fclose(fp);
+
+    if (!no->folha)
+        indice = coletaElementosBTreeRec(no->filhos[i], vetor, indice);
+
+    return indice;
 }
 
-void salvarEstatisticasRemocao(char *nomeArquivo, int percentual, int altura, int blocos) {
-    FILE *fp = fopen(nomeArquivo, "a");
-    if (fp == NULL) {
-        printf("Erro ao salvar estatísticas.\n");
-        return;
-    }
-    fprintf(fp, "%d%%,%d,%d\n", percentual, altura, blocos);
-    fclose(fp);
+int coletaElementosBTree(BTree* arvore, int* vetor, int maxTamanho) {
+    if (arvore == NULL || arvore->raiz == NULL) return 0;
+    return coletaElementosBTreeRec(arvore->raiz, vetor, 0);
 }
+
 
 
