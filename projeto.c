@@ -4,16 +4,56 @@
 
 struct noBTree {
     int *chaves;
-    int grau; // grau mínimo (t)
     struct noBTree **filhos;
+    struct noBTree *pai;
     int numChaves;
     int folha;
 };
 
 struct BTree {
     noBTree *raiz;
-    int grauMinimo; 
 };
+
+BTree* alocaBTree() {
+    BTree *arvore = (BTree *)malloc(sizeof(BTree));
+    if (!arvore) {
+        return NULL;
+    }
+    arvore->raiz = criaNoBTree(1);
+    return arvore;
+}
+
+noBTree* criaNoBTree(int folha) {
+    noBTree *no = (noBTree *)malloc(sizeof(noBTree));
+    if (!no) {
+        return NULL;
+    }
+    no->ehFolha = folha;
+    no->chaves = malloc(GRAU * sizeof(int));
+    no->filhos = malloc((GRAU + 1) * sizeof(noBTree *));
+    no->numChaves = 0;
+    return no;
+}
+
+void insereBTree(BTree *arvore, int chave){
+    noBTree *aux = arvore->raiz;
+
+    // Desce na árvore até encontrar uma folha
+    while(!aux->ehFolha){
+        int iteradorChave=0;
+        int indiceFilho=0;
+
+        while(iteradorChave < aux->numChaves && chave > aux->chaves[iteradorChave]){
+            iteradorChave++;
+        }
+
+        // Indica qual filho deve ser visitado
+        indiceFilho = iteradorChave; 
+        aux = &aux->filhos[indiceFilho];
+    }
+
+    // TODO: Inserir chave na folha
+}
 
 struct EstatisticasBTree{
     int splits;

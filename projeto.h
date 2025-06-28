@@ -2,6 +2,13 @@
 #define PROJETO_H
 
 //===============================//
+//    CONSTANTES ÁRVORE 2-3-4    //
+//===============================//
+
+const int GRAU = 3;
+const int ORDEM = 4;
+
+//===============================//
 //     STRUCTS ÁRVORE 2-3-4     //
 //===============================//
 
@@ -16,11 +23,11 @@ typedef struct EstatisticasRB EstatisticasRB;
 //     FUNÇÕES ÁRVORE 2-3-4     //
 //===============================//
 
-BTree *alocaBTree(int grau);
-noBTree *criaNoBTree(int grau, int folha);
+BTree *alocaBTree();
+noBTree *criaNoBTree(int folha);
 void insereBTree(BTree *arvore, int chave);
-void splitNoBTree(noBTree *pai, int indice, int grau);
-void insereNaoCheio(noBTree *no, int chave, int grau);
+void splitNoBTree(noBTree *pai, int indice);
+void insereNaoCheio(noBTree *no, int chave);
 void removeBTree(BTree* arvore, int chave);
 void imprimeBTree(BTree *arvore);
 struct RB *converterArvore(BTree *arvore);
