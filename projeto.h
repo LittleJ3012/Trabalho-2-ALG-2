@@ -23,10 +23,10 @@ typedef struct BTree BTree;
 //===============================//
 
 //Aloca uma nova árvore B
-BTree *alocaBTree(int grau);
+BTree* alocaBTree();
 
 //Aloca um novo Nó
-noBTree *criaNoBTree(int grau, int folha);
+noBTree* criaNoBTree(int folha);
 
 //Insere um novo nó
 void insereBTree(BTree *arvore, int chave);
@@ -77,6 +77,7 @@ void salvarEstatisticasInsercao_BTree(char *nomeArquivo, int qtd, EstatisticasBT
 void salvarEstatisticasRemocao_BTree(char *nomeArquivo, EstatisticasBTree *estat);
 
 
+
 //===============================//
 // STRUCTS ÁRVORE RUBRO NEGRA    //
 //===============================//
@@ -98,7 +99,7 @@ noRB *criaNoRB(RB *a, int chave);
 void insereArvoreRB(RB *a, noRB *no);
 
 //Remove um elemento da árvore rubro negra
-void removeArvoreRB(RB *a, int chave);
+int removeArvoreRB(RB *a, int chave);
 
 //Imprime a árvore em pré ordem
 void percorrePreOrdem(RB *a, noRB *no);
@@ -117,9 +118,6 @@ void rotacaoDireita(RB *a, noRB *noDesbalanceado);
 
 //Retorna a raiz da árvore rubro NEGRA
 noRB *retornaRaizRB(RB *a);
-
-
-
 
 
 // Geração automática das estatísticas da RB
