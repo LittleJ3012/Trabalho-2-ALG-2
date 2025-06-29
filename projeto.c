@@ -55,26 +55,83 @@ noBTree* criaNoBTree(int folha) {
     return no;
 }
 
-//Insere um nó na árvore 2-3-4
+// Realiza o split de um filho cheio e indice = indiceFilho
+void splitNoBTree(noBTree *pai, int indiceFilho){
+    noBTree *novoNo = criaNoBTree(filho->folha);
+    noBTree *filho = pai->filhos[indiceFilho];
+    novoNo->numChaves = 1;
+
+    novoNo->chaves[0] = filho->chaves[2];
+    if(!filho->folha){
+        // Copia os filhos da direita para o novo nó
+        novoNo->filhos[0] = filho->filhos[2];
+        novoNo->filhos[1] = filho->filhos[3];
+        novoNo->filhos[0]->pai = novoNo;
+        novoNo->filhos[1]->pai = novoNo;
+    }
+
+    filho->numChaves = 1;
+
+    // Desloca os filhos para a direita para abrir espaço para o novo nó
+    int i = 0;
+    for(i=pai->numChaves; i>indiceFilho; i--){
+        pai->filhos[i+1] = pai->filhos[i];
+    }
+    pai->filhos[indiceFilho+1] = novoNo;
+    
+    // Desloca as chaves para a direita e insere a nova chave
+    for(i=pai->numChaves-1; i>=indiceFilho; i--){
+        pai->chaves[i+1] = pai->chaves[i];
+    }
+    pai->chaves[indiceFilho] = filho->chaves[1];
+    pai->numChaves++;
+}
+
+// Insere um nó na árvore 2-3-4
 void insereBTree(BTree *arvore, int chave){
     noBTree *aux = arvore->raiz;
 
-    // Desce na árvore até encontrar uma folha
-    while(!aux->folha){
-        int iteradorChave=0;
-        int indiceFilho=0;
-
-        while(iteradorChave < aux->numChaves && chave > aux->chaves[iteradorChave]){
-            iteradorChave++;
-        }
-
-        // Indica qual filho deve ser visitado
-        indiceFilho = iteradorChave; 
-        aux = &aux->filhos[indiceFilho];
+    if(aux->numChaves < GRAU){
+        insereNaoCheio(aux, chave);
+    } else {
+        noBTree *novoNo = criaNoBTree(0);
+        arvore->raiz = novoNo;
+        novoNo->filhos[0] = aux;
+        splitNoBTree(novoNo, 0);
+        insereNaoCheio(novoNo, chave);
     }
-
-    // TODO: Inserir chave na folha
 }
+
+// Insere uma chave em um nó que ainda tem espaço
+void insereNaoCheio(noBTree *no, int chave){
+    int i = no->numChaves-1;
+
+    if(no->folha){
+        // Caso seja uma folha, insere a chave na posição correta
+        while(i>=0 && chave < no->chaves[i]){
+            no->chaves[i+1] = no->chaves[i];
+            i--;
+        }
+        no->chaves[i+1] = chave;
+        no->numChaves++;
+    } else {
+        // Caso não seja folha, procura o filho correto para inserir descer na árvore
+        while(i>=0 && chave < no->chaves[i]){
+            i--;
+        }
+        i++;
+        // Caso o filho tenha o número máximo de chaves, realiza o split
+        if(no->filhos[i]->numChaves == GRAU){
+            splitNoBTree(no, i);
+            if(chave > no->chaves[i]){
+                i++;
+            }
+        }
+        insereNaoCheio(no->filhos[i], chave);
+    }
+}
+
+
 
 //Função auxiliar para realizar as remoções com base em porcentagem (análise estatística)
 int coletaElementosBTreeRec(noBTree* no, int* vetor, int indice) {

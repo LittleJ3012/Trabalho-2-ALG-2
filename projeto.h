@@ -11,6 +11,13 @@ typedef struct EstatisticasBTree EstatisticasBTree;
 typedef struct EstatisticasRB EstatisticasRB;
 
 //===============================//
+//    CONSTANTES ÁRVORE 2-3-4    //
+//===============================//
+
+const int GRAU = 3;
+const int ORDEM = 4;
+
+//===============================//
 //     STRUCTS ÁRVORE 2-3-4     //
 //===============================//
 
@@ -32,10 +39,10 @@ noBTree* criaNoBTree(int folha);
 void insereBTree(BTree *arvore, int chave);
 
 //Realiza Split em um nó cheio
-void splitNoBTree(noBTree *pai, int indice, int grau);
+void splitNoBTree(noBTree *pai, int indice);
 
 //Insere em um nó que ainda tem espaço
-void insereNaoCheio(noBTree *no, int chave, int grau);
+void insereNaoCheio(noBTree *no, int chave);
 
 //Remove uma chave de um nó da B Tree
 void removeBTree(BTree* arvore, int chave);
