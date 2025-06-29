@@ -130,8 +130,236 @@ void insereNaoCheio(noBTree *no, int chave){
     }
 }
 
-//Remove uma chave de um nó da B Tree
-void removeBTree(BTree* arvore, int chave);
+// Remove uma chave de um nó folha
+void removeChaveFolha(noBTree *no, int indice){
+    int i = 0;
+    for(i = indice; i < no->numChaves - 1; i++){
+        no->chaves[i] = no->chaves[i + 1];
+    }
+    no->numChaves--;
+}
+
+// Encontra o predecessor de uma chave (maior chave na sub-árvore esquerda)
+int encontraPredecessor(noBTree *no, int indice){
+    noBTree *aux = no->filhos[indice];
+    while(!aux->folha){
+        aux = aux->filhos[aux->numChaves];
+    }
+    return aux->chaves[aux->numChaves - 1];
+}
+
+// Encontra o sucessor de uma chave (menor chave na sub-árvore direita)
+int encontraSucessor(noBTree *no, int indice){
+    noBTree *aux = no->filhos[indice + 1];
+    while(!aux->folha){
+        aux = aux->filhos[0];
+    }
+    return aux->chaves[0];
+}
+
+// Faz merge de um filho com seu irmão direito
+void mergeFilhos(noBTree *no, int indice){
+    noBTree *filho = no->filhos[indice];
+    noBTree *irmao = no->filhos[indice + 1];
+    
+    // Move a chave do nó atual para o filho
+    filho->chaves[filho->numChaves] = no->chaves[indice];
+    filho->numChaves++;
+    
+    // Copia as chaves do irmão para o filho
+    int i = 0;
+    for(i = 0; i < irmao->numChaves; i++){
+        filho->chaves[filho->numChaves + i] = irmao->chaves[i];
+    }
+    
+    // Copia os filhos do irmão se não for folha
+    if(!filho->folha){
+        for(i = 0; i <= irmao->numChaves; i++){
+            filho->filhos[filho->numChaves + i] = irmao->filhos[i];
+            if(irmao->filhos[i] != NULL){
+                irmao->filhos[i]->pai = filho;
+            }
+        }
+    }
+    filho->numChaves += irmao->numChaves;
+    
+    // Remove a chave do nó atual
+    for(i = indice; i < no->numChaves - 1; i++){
+        no->chaves[i] = no->chaves[i + 1];
+    }
+    
+    // Remove o ponteiro do irmão
+    for(i = indice + 1; i < no->numChaves; i++){
+        no->filhos[i] = no->filhos[i + 1];
+    }
+    
+    no->numChaves--;
+    free(irmao);
+}
+
+// Pega uma chave emprestada do irmão anterior
+void pegaEmprestadoDoAnterior(noBTree *no, int indice){
+    noBTree *filho = no->filhos[indice];
+    noBTree *irmao = no->filhos[indice - 1];
+    
+    // Move todas as chaves do filho uma posição à frente
+    int i = 0;
+    for(i = filho->numChaves; i > 0; i--){
+        filho->chaves[i] = filho->chaves[i - 1];
+    }
+    
+    // Se não for folha, move os filhos também
+    if(!filho->folha){
+        for(i = filho->numChaves + 1; i > 0; i--){
+            filho->filhos[i] = filho->filhos[i - 1];
+        }
+        filho->filhos[0] = irmao->filhos[irmao->numChaves];
+        if(irmao->filhos[irmao->numChaves] != NULL){
+            irmao->filhos[irmao->numChaves]->pai = filho;
+        }
+    }
+    
+    // Move a chave do pai para o filho
+    filho->chaves[0] = no->chaves[indice - 1];
+    filho->numChaves++;
+    
+    // Move a última chave do irmão para o pai
+    no->chaves[indice - 1] = irmao->chaves[irmao->numChaves - 1];
+    irmao->numChaves--;
+}
+
+// Pega uma chave emprestada do próximo irmão
+void pegaEmprestadoDoProximo(noBTree *no, int indice){
+    noBTree *filho = no->filhos[indice];
+    noBTree *irmao = no->filhos[indice + 1];
+    
+    // Move a chave do pai para o final do filho
+    filho->chaves[filho->numChaves] = no->chaves[indice];
+    filho->numChaves++;
+    
+    // Se não for folha, move o primeiro filho do irmão
+    if(!filho->folha){
+        filho->filhos[filho->numChaves] = irmao->filhos[0];
+        if(irmao->filhos[0] != NULL){
+            irmao->filhos[0]->pai = filho;
+        }
+    }
+    
+    // Move a primeira chave do irmão para o pai
+    no->chaves[indice] = irmao->chaves[0];
+    
+    // Remove a primeira chave do irmão
+    int i = 0;
+    for(i = 0; i < irmao->numChaves - 1; i++){
+        irmao->chaves[i] = irmao->chaves[i + 1];
+    }
+    
+    // Se não for folha, move os filhos do irmão
+    if(!irmao->folha){
+        for(i = 0; i < irmao->numChaves; i++){
+            irmao->filhos[i] = irmao->filhos[i + 1];
+        }
+    }
+    
+    irmao->numChaves--;
+}
+
+// Garante que um filho tenha pelo menos 2 chaves antes de descer
+void garanteChavesSuficientes(noBTree *no, int indice){
+    noBTree *filho = no->filhos[indice];
+    
+    if(filho->numChaves >= 2){
+        return;
+    }
+    
+    // Verifica se pode pegar emprestado com algum dos irmãos
+    if(indice > 0 && no->filhos[indice - 1]->numChaves >= 2){
+        pegaEmprestadoDoAnterior(no, indice);
+    } else if(indice < no->numChaves && no->filhos[indice + 1]->numChaves >= 2){
+        pegaEmprestadoDoProximo(no, indice);
+    } else {
+        // Se não, faz merge com o irmão da direita se possível, caso contrário, com o da esquerda
+        if(indice < no->numChaves){
+            mergeFilhos(no, indice);
+        } else {
+            mergeFilhos(no, indice - 1);
+        }
+    }
+}
+
+// Remove uma chave de um nó específico
+void removeChaveNo(noBTree *no, int chave){
+    int indiceChave = -1;
+    int i = 0;
+
+    for(i=0; i<no->numChaves; i++){
+        if(no->chaves[i] == chave){
+            indiceChave = i;
+            break;
+        }
+    }
+    
+    if(indiceChave != -1){
+        if(no->folha){
+            removeChaveFolha(no, indiceChave);
+        } else {
+            noBTree *filhoEsq = no->filhos[indiceChave];
+            noBTree *filhoDir = no->filhos[indiceChave + 1];
+            
+            // Vê se algum dos filhos tem chaves suficientes, se não, faz merge
+            if(filhoEsq->numChaves >= 2){
+                int predecessor = encontraPredecessor(no, indiceChave);
+                no->chaves[indiceChave] = predecessor;
+                removeChaveNo(filhoEsq, predecessor);
+            } else if (filhoDir->numChaves >= 2) {
+                int sucessor = encontraSucessor(no, indiceChave);
+                no->chaves[indiceChave] = sucessor;
+                removeChaveNo(filhoDir, sucessor);
+            } else {
+                mergeFilhos(no, indiceChave);
+                removeChaveNo(filhoEsq, chave);
+            }
+        }
+    } else {
+        // Chave não encontrada
+        if(no->folha){
+            return;
+        }
+        
+        // Encontra o filho correto para descer
+        int i = 0;
+        while(i < no->numChaves && chave > no->chaves[i]){
+            i++;
+        }
+        
+        // Garante que o filho tenha pelo menos 2 chaves
+        garanteChavesSuficientes(no, i);
+        
+        // Como pode ter ocorrido um merge, a estrutura pode ter mudado, então atualizamos o indice
+        if(i > no->numChaves){
+            removeChaveNo(no->filhos[i - 1], chave);
+        } else {
+            removeChaveNo(no->filhos[i], chave);
+        }
+    }
+}
+
+// Remove uma chave da árvore
+void removeBTree(BTree *arvore, int chave) {
+    if(arvore == NULL || arvore->raiz == NULL){
+        return;
+    }
+    
+    removeChaveNo(arvore->raiz, chave);
+    
+    // Se a raiz ficou vazia e não é folha, promove o único filho
+    if(arvore->raiz->numChaves == 0 && !arvore->raiz->folha){
+        noBTree *raizVelha = arvore->raiz;
+        arvore->raiz = arvore->raiz->filhos[0];
+        arvore->raiz->pai = NULL;
+        free(raizVelha);
+    }
+}
 
 //Imprime a B Tree 2-3-4
 void imprimeBTree(BTree *arvore);

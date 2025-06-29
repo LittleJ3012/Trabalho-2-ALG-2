@@ -29,12 +29,6 @@ noBTree* criaNoBTree(int folha);
 // Insere um novo nó
 void insereBTree(BTree *arvore, int chave);
 
-// Realiza Split em um nó cheio
-void splitNoBTree(noBTree *pai, int indice);
-
-// Insere em um nó que ainda tem espaço
-void insereNaoCheio(noBTree *no, int chave);
-
 // Remove uma chave de um nó da B Tree
 void removeBTree(BTree* arvore, int chave);
 
@@ -44,6 +38,44 @@ void imprimeBTree(BTree *arvore);
 // Converte a árvore B em uma árvore rubro negra
 struct RB; // Forward declaration para evitar inclusão circular
 struct RB *converterArvore(BTree *arvore);
+
+//===============================//
+//  FUNÇÕES AUXILIARES INSERÇÃO  //
+//===============================//
+
+// Realiza Split em um nó cheio
+void splitNoBTree(noBTree *pai, int indice);
+
+// Insere em um nó que ainda tem espaço
+void insereNaoCheio(noBTree *no, int chave);
+
+//===============================//
+//  FUNÇÕES AUXILIARES REMOÇÃO   //
+//===============================//
+
+// Remove uma chave de um nó folha
+void removeChaveFolha(noBTree *no, int indice);
+
+// Encontra o predecessor de uma chave (maior chave na sub-árvore esquerda)
+int encontraPredecessor(noBTree *no, int indice);
+
+// Encontra o sucessor de uma chave (menor chave na sub-árvore direita)
+int encontraSucessor(noBTree *no, int indice);
+
+// Faz merge de um filho com seu irmão direito
+void mergeFilhos(noBTree *no, int indice);
+
+// Pega uma chave emprestada do irmão anterior
+void pegaEmprestadoDoAnterior(noBTree *no, int indice);
+
+// Pega uma chave emprestada do próximo irmão
+void pegaEmprestadoDoProximo(noBTree *no, int indice);
+
+// Garante que um filho tenha pelo menos 2 chaves antes de descer
+void garanteChavesSuficientes(noBTree *no, int indice);
+
+// Remove uma chave de um nó específico (função recursiva principal)
+void removeChaveNo(noBTree *no, int chave);
 
 //===============================//
 //   MÉTRICAS E ESTATÍSTICAS    //
