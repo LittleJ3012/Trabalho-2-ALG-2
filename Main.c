@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "projeto.h"
+#include "BTree.h"
+#include "RB.h"
 
 int main(void) {
     int programaRodando = 1;
@@ -117,43 +118,40 @@ int main(void) {
         // ANÁLISE ESTATÍSTICA PÓS MENU
         // ============================
 
-        // Executa a análise de benchmarking apenas se a árvore tiver 10 mil elementos
-            printf("\nAnálise de benchmarking (remoção por porcentagem)...\n");
+        printf("\nAnálise de benchmarking (remoção por porcentagem)...\n");
 
-            float percentuais[] = {10, 20, 35, 50};
-            int totalElementos = contarNos(arvore234);
-            int *elementos = (int*)malloc(totalElementos * sizeof(int));
-            coletaElementosBTree(arvore234, elementos, totalElementos);
+        float percentuais[] = {10, 20, 35, 50};
+        int *elementos = (int*)malloc(quantidade * sizeof(int));
+        int totalElementos = coletaElementosBTree(arvore234, elementos, quantidade);
 
-            for (int i = 0; i < 4; i++) {
-                float pct = percentuais[i];
-                resetarMetricas(); // Zera os contadores
+        for (int i = 0; i < 4; i++) {
+            float pct = percentuais[i];
+            resetarMetricas(); // Zera os contadores
 
-                BTree *copia = alocaBTree(2);
-                for (int j = 0; j < totalElementos; j++) {
-                    insereBTree(copia, elementos[j]);
-                }
-
-                int remover = (int)((pct / 100.0f) * totalElementos);
-                for (int j = 0; j < remover; j++) {
-                    removeBTree(copia, elementos[j]);
-                }
-
-                EstatisticasBTree *estatRem = gerarEstatisticasRemocao_BTree(copia, pct);
-                salvarEstatisticasRemocao_BTree("estatisticas_remocao.csv", estatRem);
-                free(estatRem);
+            BTree *copia = alocaBTree(2);
+            for (int j = 0; j < totalElementos; j++) {
+                insereBTree(copia, elementos[j]);
             }
 
-            free(elementos);
+            int remover = (int)((pct / 100.0f) * totalElementos);
+            for (int j = 0; j < remover; j++) {
+                removeBTree(copia, elementos[j]);
+            }
+
+            EstatisticasBTree *estatRem = gerarEstatisticasRemocao_BTree(copia, pct);
+            salvarEstatisticasRemocao_BTree("estatisticas_remocao.csv", estatRem);
+            free(estatRem);
+        }
+
+        free(elementos);
 
         // Análise estatística da árvore Rubro-Negra convertida
-        printf("\nGerando estatísticas da árvore Rubro-Negra final...\n");
-        RB *rbFinal = converterArvore(arvore234);
-        EstatisticasRB *estatRB = gerarEstatisticasRemocao_RB(rbFinal, quantidade);
-        salvarEstatisticasRemocao_RB("estatisticas_rb.csv", estatRB);
-        free(estatRB);
-
-        free(estat);
+        printf("\nGerando benchmarking da Rubro-Negra com remoções parciais...\n");
+        float percentuaisRB[] = {10, 20, 35, 50};
+        for (int i = 0; i < 4; i++) {
+            benchmarkRemocao_RB(arvore234, percentuaisRB[i], "estatisticas_rb.csv");
+        }
+        
         if (opMenu1 == 6) programaRodando = 0;
         
     }
@@ -161,5 +159,4 @@ int main(void) {
     printf("\nPrograma encerrado. Obrigado por utilizar!\n");
     return 0;
 }
-
 
