@@ -48,7 +48,7 @@ noBTree* criaNoBTree(int folha) {
     if (!no) {
         return NULL;
     }
-    no->ehFolha = folha;
+    no->folha = folha;
     no->chaves = malloc(GRAU * sizeof(int));
     no->filhos = malloc((GRAU + 1) * sizeof(noBTree *));
     no->numChaves = 0;
@@ -60,7 +60,7 @@ void insereBTree(BTree *arvore, int chave){
     noBTree *aux = arvore->raiz;
 
     // Desce na árvore até encontrar uma folha
-    while(!aux->ehFolha){
+    while(!aux->folha){
         int iteradorChave=0;
         int indiceFilho=0;
 
@@ -109,7 +109,6 @@ EstatisticasBTree *gerarEstatisticasInsercao_BTree(BTree *arvore, int qtd) {
     e->percentualRemocao = 0.0f;
     return e;
 }
-
 
 //Structs da Red Black Tree:
 
@@ -176,12 +175,12 @@ void insereArvoreRB(RB *a, noRB *no){
     noRB *raiz = a->sentinela->esq;
 
     if(raiz == a->sentinela){
-        a->sentinela->esq = novoNo;
-        novoNo->pai = a->sentinela;
-        novoNo->esq = a->sentinela;
-        novoNo->dir = a->sentinela;
-        novoNo->cor = 'V';
-        balanceaInsercao(a, novoNo);
+        a->sentinela->esq = no;
+        no->pai = a->sentinela;
+        no->esq = a->sentinela;
+        no->dir = a->sentinela;
+        no->cor = 'V';
+        balanceaInsercao(a, no);
         return;
     }
 
@@ -190,33 +189,33 @@ void insereArvoreRB(RB *a, noRB *no){
 
     while(atual != a->sentinela){
         pai = atual;
-        if(novoNo->chave < atual->chave){
+        if(no->chave < atual->chave){
             atual = atual->esq;
         }else{
             atual = atual->dir;
         }
     }
 
-    novoNo->pai = pai;
-    novoNo->esq = a->sentinela;
-    novoNo->dir = a->sentinela;
-    novoNo->cor = 'V';
+    no->pai = pai;
+    no->esq = a->sentinela;
+    no->dir = a->sentinela;
+    no->cor = 'V';
 
-    if(novoNo->chave < pai->chave){
-        pai->esq = novoNo;
+    if(no->chave < pai->chave){
+        pai->esq = no;
     }else{
-        pai->dir = novoNo;
+        pai->dir = no;
     }
 
-    balanceaInsercao(a, novoNo);
+    balanceaInsercao(a, no);
 }
 
 //Remove um elemento da árvore rubro negra
-void removeArvoreRB(RB *a, int chave){
+int removeArvoreRB(RB *a, int chave){
     noRB *atual = a->sentinela->esq;
 
-    while(atual != a->sentinela && atual->chave != valor){
-        if(valor < atual->chave){
+    while(atual != a->sentinela && atual->chave != chave){
+        if(chave < atual->chave){
             atual = atual->esq;
         } else {
             atual = atual->dir;
@@ -335,7 +334,7 @@ void balanceaInsercao(RB *a, noRB *z){
 }
 
 //Realiza o balanceamento após uma remoção
-void balanceaRemocao(arv *a, noRB *y, noRB *pai) {
+void balanceaRemocao(RB *a, noRB *y, noRB *pai) {
     while (y != a->sentinela && y->cor == 'P') {
         if (y == pai->esq) {
             // Irmão à direita
