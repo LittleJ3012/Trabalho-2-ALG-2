@@ -51,10 +51,10 @@ RB *alocaArvoreRB(){
     a->sentinela->dir = a->sentinela;
     a->sentinela->pai = a->sentinela;
     a->sentinela->cor = 'P'; // Cor preta
-    a->sentinela->chave = -1; // Valor simbólico para chave nula
+    a->sentinela->chave = -1; // Valor para chave nula
 
     // Define a raiz como sendo o próprio sentinela (árvore vazia)
-    a->sentinela->dir = a->sentinela; // raiz = sentinela->dir
+    a->sentinela->esq = a->sentinela; // raiz = sentinela->esq
 
     return a;
 }
@@ -361,7 +361,7 @@ void rotacaoDireita(RB *a, noRB *noDesbalanceado){
     y->pai = noDesbalanceado->pai;
     
     if(noDesbalanceado->pai == a->sentinela){
-        a->sentinela->dir = y;
+        a->sentinela->esq = y;
     }else if(noDesbalanceado->pai->dir == noDesbalanceado){
         noDesbalanceado->pai->dir = y;
     }else{
@@ -378,12 +378,22 @@ noRB *retornaRaizRB(RB *a){
 }
 
 //Calcula a altura da árvore Rubro NEGRA
-int alturaRB(RB *a, noRB *no){
-    if (no == a->sentinela) return 0;
+int alturaRB(RB *a, noRB *no) {
+    if (no == a->sentinela) {
+        return 0;
+    }
 
     int altEsq = alturaRB(a, no->esq);
     int altDir = alturaRB(a, no->dir);
-    return 1 + (altEsq > altDir ? altEsq : altDir);
+    int maiorAltura;
+
+    if (altEsq > altDir) {
+        maiorAltura = altEsq;
+    } else {
+        maiorAltura = altDir;
+    }
+
+    return 1 + maiorAltura;
 }
 
 
@@ -418,7 +428,7 @@ void salvarEstatisticasRemocao_RB(char *nomeArquivo, EstatisticasRB *estat){
 
 
 void benchmarkRemocao_RB(BTree *original, float percentual, char *arquivoCSV) {
-    int *elementos = malloc(100000 * sizeof(int)); // tamanho máximo seguro
+    int *elementos = malloc(100000 * sizeof(int)); 
     int total = coletaElementosBTree(original, elementos, 100000);
 
     RB *rb = converterArvore(original);
