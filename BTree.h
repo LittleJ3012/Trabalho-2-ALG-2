@@ -8,6 +8,8 @@
 // Definições das structs para guardar estatísticas sobre as operações na árvore 2-3-4
 typedef struct EstatisticasBTree EstatisticasBTree;
 
+
+
 //===============================//
 //     STRUCTS ÁRVORE 2-3-4     //
 //===============================//
@@ -15,6 +17,8 @@ typedef struct EstatisticasBTree EstatisticasBTree;
 // Definição das structs da árvore B e de seu nó
 typedef struct noBTree noBTree;
 typedef struct BTree BTree;
+
+
 
 //===============================//
 //     FUNÇÕES ÁRVORE 2-3-4     //
@@ -39,6 +43,8 @@ void imprimeBTree(BTree *arvore);
 struct RB; // Forward declaration para evitar inclusão circular
 struct RB *converterArvore(BTree *arvore);
 
+
+
 //===============================//
 //  FUNÇÕES AUXILIARES INSERÇÃO  //
 //===============================//
@@ -48,6 +54,8 @@ void splitNoBTree(noBTree *pai, int indice);
 
 // Insere em um nó que ainda tem espaço
 void insereNaoCheio(noBTree *no, int chave);
+
+
 
 //===============================//
 //  FUNÇÕES AUXILIARES REMOÇÃO   //
@@ -77,6 +85,8 @@ void garanteChavesSuficientes(noBTree *no, int indice);
 // Remove uma chave de um nó específico (função recursiva principal)
 void removeChaveNo(noBTree *no, int chave);
 
+
+
 //===============================//
 //   MÉTRICAS E ESTATÍSTICAS    //
 //===============================//
@@ -87,6 +97,9 @@ int calcularAltura(BTree *arvore);
 // Resseta as métricas para evitar erros
 void resetarMetricas();
 
+// Função recursiva para contar blocos (nós) da árvore
+int contarNos(noBTree *no);
+
 // Conta o número de elementos da B Tree a fim de realizar as operações de remoção
 int coletaElementosBTree(BTree* arvore, int* vetor, int maxTamanho);
 
@@ -94,9 +107,23 @@ int coletaElementosBTree(BTree* arvore, int* vetor, int maxTamanho);
 EstatisticasBTree *gerarEstatisticasInsercao_BTree(BTree *arvore, int qtd);
 EstatisticasBTree *gerarEstatisticasRemocao_BTree(BTree *arvore, float percentual);
 
-// Salva os dados das análises estatísticas em arquivos
+// Salva os dados das análises estatísticas  de inserção e remoção em arquivos
 void salvarEstatisticasInsercao_BTree(char *nomeArquivo, int qtd, EstatisticasBTree *estat);
 void salvarEstatisticasRemocao_BTree(char *nomeArquivo, EstatisticasBTree *estat);
+
+//Funções que encapsulam as funções de geração e salvamento e que serão chamadas na main: 
+
+//A variável quantidade é a quantidade de elementos que o usuário digitou na hora de criar o arquivo
+//com os números inteiros
+void benchmarkInsercao_BTree(BTree *arvore, int quantidade, char *arquivoCSV);
+
+//O percentual indica a porcentagem de elementos a serem removidos da árvore 2-3-4 para fins de análise
+void benchmarkRemocao_BTree(BTree *arvore, float percentual, char *arquivoCSV);
+
+
+// Variável global de estatísticas
+extern EstatisticasBTree estatGlobal;
+
 
 //===============================//
 // GERAÇÃO DE DADOS             //
