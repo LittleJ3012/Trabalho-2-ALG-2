@@ -66,6 +66,8 @@ noBTree* criaNoBTree(int folha) {
 
 // Realiza o split de um filho cheio e indice = indiceFilho
 void splitNoBTree(noBTree *pai, int indiceFilho){
+    estatGlobal.splits++;//Para contabilizar os splits
+    
     noBTree *filho = pai->filhos[indiceFilho];
     noBTree *novoNo = criaNoBTree(filho->folha);
     novoNo->numChaves = 1;
