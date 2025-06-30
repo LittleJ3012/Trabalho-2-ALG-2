@@ -3,16 +3,6 @@
 #include "RB.h"
 #include "BTree.h"
 
-//Struct para as análises estatísticas
-struct EstatisticasRB {
-    int rotacoesEsq;
-    int rotacoesDir;
-    int altura;
-    int blocos;
-    float percentualRemocao;
-};
-
-
 //Structs da Red Black Tree:
 
 struct noRB{
@@ -394,55 +384,6 @@ int alturaRB(RB *a, noRB *no) {
     }
 
     return 1 + maiorAltura;
-}
-
-
-EstatisticasRB *gerarEstatisticasRemocao_RB(RB *arvore, float percentual, int qtd){
-    EstatisticasRB *estat = (EstatisticasRB*)malloc(sizeof(EstatisticasRB));
-    if (!estat) return NULL;
-
-    estat->rotacoesEsq = arvore->rotacoesEsq;
-    estat->rotacoesDir = arvore->rotacoesDir;
-    estat->altura = alturaRB(arvore, retornaRaizRB(arvore));
-    estat->blocos = qtd;
-    estat->percentualRemocao = percentual;
-
-    return estat;
-}
-
-
-void salvarEstatisticasRemocao_RB(char *nomeArquivo, EstatisticasRB *estat){
-    FILE *f = fopen(nomeArquivo, "a");
-    if (!f) return;
-
-    fprintf(f, "%.2f,%d,%d,%d,%d\n",
-        estat->percentualRemocao,
-        estat->rotacoesEsq,
-        estat->rotacoesDir,
-        estat->altura,
-        estat->blocos
-    );
-
-    fclose(f);
-}
-
-
-void benchmarkRemocao_RB(BTree *original, float percentual, char *arquivoCSV) {
-    int *elementos = malloc(100000 * sizeof(int)); 
-    int total = coletaElementosBTree(original, elementos, 100000);
-
-    RB *rb = converterArvore(original);
-
-    int remover = (int)((percentual / 100.0f) * total);
-    for (int i = 0; i < remover; i++) {
-        removeArvoreRB(rb, elementos[i]);
-    }
-
-    EstatisticasRB *estat = gerarEstatisticasRemocao_RB(rb, percentual, total);
-    salvarEstatisticasRemocao_RB(arquivoCSV, estat);
-
-    free(elementos);
-    free(estat);
 }
 
 
