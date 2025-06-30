@@ -347,22 +347,3 @@ void rotacaoDireita(RB *a, noRB *noDesbalanceado){
 noRB *retornaRaizRB(RB *a){
     return a->sentinela->esq;
 }
-
-//Calcula a altura da árvore Rubro NEGRA
-int alturaRB(RB *a, noRB *no) {
-    if (no == a->sentinela) {
-        return 0;
-    }
-
-    int altEsq = alturaRB(a, no->esq);
-    int altDir = alturaRB(a, no->dir);
-    int maiorAltura;
-
-    if (altEsq > altDir) {
-        maiorAltura = altEsq;
-    } else {
-        maiorAltura = altDir;
-    }
-
-    return 1 + maiorAltura;
-}
