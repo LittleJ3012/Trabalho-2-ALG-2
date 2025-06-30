@@ -54,7 +54,4 @@ void rotacaoDireita(RB *a, noRB *noDesbalanceado);
 //Retorna a raiz da árvore rubro NEGRA
 noRB *retornaRaizRB(RB *a);
 
-//Calcula a altura da árvore Rubro NEGRA
-int alturaRB(RB *a, noRB *no);
-
 #endif 
