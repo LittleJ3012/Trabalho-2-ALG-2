@@ -182,6 +182,8 @@ int encontraSucessor(noBTree *no, int indice){
 
 // Faz merge de um filho com seu irmão direito
 void mergeFilhos(noBTree *no, int indice){
+    estatGlobal.merges++;     // Já estava OK
+    estatGlobal.rotacoes++; 
     noBTree *filho = no->filhos[indice];
     noBTree *irmao = no->filhos[indice + 1];
     
@@ -222,6 +224,7 @@ void mergeFilhos(noBTree *no, int indice){
 
 // Pega uma chave emprestada do irmão anterior
 void pegaEmprestadoDoAnterior(noBTree *no, int indice){
+    estatGlobal.rotacoes++;
     noBTree *filho = no->filhos[indice];
     noBTree *irmao = no->filhos[indice - 1];
     
@@ -253,6 +256,7 @@ void pegaEmprestadoDoAnterior(noBTree *no, int indice){
 
 // Pega uma chave emprestada do próximo irmão
 void pegaEmprestadoDoProximo(noBTree *no, int indice){
+    estatGlobal.rotacoes++;
     noBTree *filho = no->filhos[indice];
     noBTree *irmao = no->filhos[indice + 1];
     
