@@ -51,6 +51,12 @@ noBTree* criaNoBTree(int folha) {
     no->chaves = malloc(GRAU * sizeof(int));
     no->filhos = malloc((GRAU + 1) * sizeof(noBTree *));
     no->numChaves = 0;
+    no->pai = NULL;
+    
+    for (int i = 0; i <= GRAU; i++) {
+        no->filhos[i] = NULL;
+    }
+    
     return no;
 }
 
@@ -59,16 +65,20 @@ void splitNoBTree(noBTree *pai, int indiceFilho){
     noBTree *filho = pai->filhos[indiceFilho];
     noBTree *novoNo = criaNoBTree(filho->folha);
     novoNo->numChaves = 1;
+    novoNo->pai = pai;
 
     novoNo->chaves[0] = filho->chaves[2];
     if(!filho->folha){
         // Copia os filhos da direita para o novo nó
         novoNo->filhos[0] = filho->filhos[2];
         novoNo->filhos[1] = filho->filhos[3];
-        novoNo->filhos[0]->pai = novoNo;
-        novoNo->filhos[1]->pai = novoNo;
+        if (novoNo->filhos[0] != NULL) {
+            novoNo->filhos[0]->pai = novoNo;
+        }
+        if (novoNo->filhos[1] != NULL) {
+            novoNo->filhos[1]->pai = novoNo;
+        }
     }
-
     filho->numChaves = 1;
 
     // Desloca os filhos para a direita para abrir espaço para o novo nó
@@ -96,6 +106,7 @@ void insereBTree(BTree *arvore, int chave){
         noBTree *novoNo = criaNoBTree(0);
         arvore->raiz = novoNo;
         novoNo->filhos[0] = aux;
+        aux->pai = novoNo;
         splitNoBTree(novoNo, 0);
         insereNaoCheio(novoNo, chave);
     }
@@ -103,9 +114,17 @@ void insereBTree(BTree *arvore, int chave){
 
 // Insere uma chave em um nó que ainda tem espaço
 void insereNaoCheio(noBTree *no, int chave){
-    int i = no->numChaves-1;
+    int i = 0;
 
-    if(no->folha){
+    // Verifica se a chave já existe, evitando valores duplicados
+    for(i = 0; i < no->numChaves; i++){
+        if(no->chaves[i] == chave){
+            return;
+        }
+    }
+
+    i = no->numChaves-1;
+    if(no->folha){        
         // Caso seja uma folha, insere a chave na posição correta
         while(i>=0 && chave < no->chaves[i]){
             no->chaves[i+1] = no->chaves[i];
@@ -361,24 +380,49 @@ void removeBTree(BTree *arvore, int chave) {
     }
 }
 
+void imprimeBTreeRec(noBTree *no, int nivel){
+    if(no == NULL){
+        return;
+    }
+
+    int i = 0;
+    for(i = 0; i < nivel; i++){
+        printf("  ");
+    }
+    
+    printf("|-- [");
+    for(i = 0; i < no->numChaves; i++){
+        printf("%d", no->chaves[i]);
+        if(i < no->numChaves - 1){
+            printf(", ");
+        }
+    }
+    printf("]\n");
+    
+    for(i = 0; i <= no->numChaves; i++){
+        imprimeBTreeRec(no->filhos[i], nivel + 1);
+    }
+}
+
 //Imprime a B Tree 2-3-4
-void imprimeBTree(BTree *arvore);
+void imprimeBTree(BTree *arvore){
+    if(arvore == NULL || arvore->raiz == NULL){
+        return;
+    }
+    imprimeBTreeRec(arvore->raiz, 0);
+}
 
-//Converte a árvore B em um árvore rubro negra
-struct RB *converterArvore(BTree *arvore);
-
-
-//Conta o número de splits durante as operações
-int contarSplits(BTree *arvore);
-
-//Conta o número de Merges
-int contarMerges(); 
-
-//Atualiza a altura da árvore a cada operação
-int calcularAltura(BTree *arvore);
-
-//Conta o total de nós da árvore a cada operação
-int contarNos(BTree *arvore);
+// Calcula a altura da árvore descendo pelo filho mais a esquerda
+// pois pela propriedade da B Tree, a altura é a mesma para todos os nós
+int calcularAltura(BTree *arvore) {
+    int altura = 0;
+    noBTree *aux = arvore->raiz;
+    while(aux != NULL){
+        altura++;
+        aux = aux->filhos[0];
+    }
+    return altura;
+}
 
 //Resseta as métricas para evitar erros
 void resetarMetricas();

@@ -23,7 +23,7 @@ int main(void) {
 
         criaArquivo(nomeArquivo, quantidade, semente);
 
-        BTree *arvore234 = alocaBTree(2);
+        BTree *arvore234 = alocaBTree();
         resetarMetricas();
 
         FILE *arquivo = fopen(nomeArquivo, "r");
@@ -128,7 +128,7 @@ int main(void) {
             float pct = percentuais[i];
             resetarMetricas(); // Zera os contadores
 
-            BTree *copia = alocaBTree(2);
+            BTree *copia = alocaBTree();
             for (int j = 0; j < totalElementos; j++) {
                 insereBTree(copia, elementos[j]);
             }
