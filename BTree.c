@@ -9,14 +9,18 @@
 const int GRAU = 3;
 const int ORDEM = 4;
 
-//Structs para as análises estatísticas
-struct EstatisticasBTree{
+//Struct para as análises estatísticas da árvore 2-3-4
+struct EstatisticasBTree {
     int splits;
     int merges;
     int altura;
     int blocos;
+    int rotacoes;
     float percentualRemocao;
 };
+
+// Variável global usada para armazenar métricas
+EstatisticasBTree estatGlobal;
 
 //Structs da B Tree / 2-3-4
 struct noBTree {
@@ -380,6 +384,7 @@ void removeBTree(BTree *arvore, int chave) {
     }
 }
 
+//Função auxiliar para realizar a impressão dos valores da B Tree
 void imprimeBTreeRec(noBTree *no, int nivel){
     if(no == NULL){
         return;
@@ -425,7 +430,25 @@ int calcularAltura(BTree *arvore) {
 }
 
 //Resseta as métricas para evitar erros
-void resetarMetricas();
+void resetarMetricas() {
+    estatGlobal.splits = 0;
+    estatGlobal.merges = 0;
+    estatGlobal.altura = 0;
+    estatGlobal.blocos = 0;
+    estatGlobal.rotacoes = 0;
+    estatGlobal.percentualRemocao = 0.0f;
+}
+
+//Função para auxiliar na contagem do número de blocos:
+// Função recursiva para contar blocos (nós) da árvore
+int contarNos(noBTree *no) {
+    if (no == NULL) return 0;
+    int total = 1;
+    for (int i = 0; i <= no->numChaves; i++) {
+        total += contarNos(no->filhos[i]);
+    }
+    return total;
+}
 
 
 //Função auxiliar para realizar as remoções com base em porcentagem (análise estatística)
@@ -452,13 +475,52 @@ int coletaElementosBTree(BTree* arvore, int* vetor, int maxTamanho) {
 }
 
 
+// Geração de estatísticas para inserção
+EstatisticasBTree* gerarEstatisticasInsercao_BTree(BTree *arvore, int qtd) {
+    estatGlobal.altura = calcularAltura(arvore);
+    estatGlobal.blocos = contarNos(arvore->raiz);
+    return &estatGlobal;
+}
+
+// Geração de estatísticas para remoção
+EstatisticasBTree* gerarEstatisticasRemocao_BTree(BTree *arvore, float percentual) {
+    estatGlobal.percentualRemocao = percentual;
+    estatGlobal.altura = calcularAltura(arvore);
+    estatGlobal.blocos = contarNos(arvore->raiz);
+    return &estatGlobal;
+}
+
+
 
 //Salva os dados das análises estatísticas em arquivos
-void salvarEstatisticasInsercao_BTree(char *nomeArquivo, int qtd, EstatisticasBTree *estat);
+void salvarEstatisticasInsercao_BTree(char *nomeArquivo, int qtd, EstatisticasBTree *estat) {
+    FILE *f = fopen(nomeArquivo, "a");
+    if (!f) return;
+
+    fprintf(f, "%d,%d,%d,%d\n", qtd, estat->splits, estat->altura, estat->blocos);
+    fclose(f);
+}
+
+void salvarEstatisticasRemocao_BTree(char *nomeArquivo, EstatisticasBTree *estat) {
+    FILE *f = fopen(nomeArquivo, "a");
+    if (!f) return;
+
+    fprintf(f, "%.0f%%,%d,%d,%d,%d\n", estat->percentualRemocao, estat->rotacoes,
+            estat->merges, estat->altura, estat->blocos);
+    fclose(f);
+}
 
 
-void salvarEstatisticasRemocao_BTree(char *nomeArquivo, EstatisticasBTree *estat);
+//Funções de benchMarking a serem chamadas na main
+void benchmarkInsercao_BTree(BTree *arvore, int quantidade, char *arquivoCSV) {
+    EstatisticasBTree *estat = gerarEstatisticasInsercao_BTree(arvore, quantidade);
+    salvarEstatisticasInsercao_BTree(arquivoCSV, quantidade, estat);
+}
 
+void benchmarkRemocao_BTree(BTree *arvore, float percentual, char *arquivoCSV) {
+    EstatisticasBTree *estat = gerarEstatisticasRemocao_BTree(arvore, percentual);
+    salvarEstatisticasRemocao_BTree(arquivoCSV, estat);
+}
 
 //Cria um arquivo com uma determinada quantidade de números aleatórios
 int criaArquivo(char *nomeArquivo, int qtd, int semente){
