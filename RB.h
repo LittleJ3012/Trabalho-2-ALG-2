@@ -4,13 +4,6 @@
 #include "BTree.h" 
 
 //===============================//
-//STRUCT PARA A ANÁLISE ESTATÍSTICA//
-//===============================//
-
-// Definição da struct para guardar estatísticas sobre as operações na Red Black
-typedef struct EstatisticasRB EstatisticasRB;
-
-//===============================//
 // STRUCTS ÁRVORE RUBRO NEGRA    //
 //===============================//
 
@@ -53,12 +46,6 @@ noRB *retornaRaizRB(RB *a);
 
 //Calcula a altura da árvore Rubro NEGRA
 int alturaRB(RB *a, noRB *no);
-
-// Geração automática das estatísticas da RB
-void salvarEstatisticasRemocao_RB(char *nomeArquivo, EstatisticasRB *estat);
-EstatisticasRB *gerarEstatisticasRemocao_RB(RB *arvore, float percentual, int qtd);
-
-void benchmarkRemocao_RB(BTree *original, float percentual, char *arquivoCSV);
 
 //Resseta as rotações da árvore rubro negra
 void resetarRubroNegra(RB *a);
