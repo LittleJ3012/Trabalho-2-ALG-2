@@ -47,7 +47,4 @@ noRB *retornaRaizRB(RB *a);
 //Calcula a altura da árvore Rubro NEGRA
 int alturaRB(RB *a, noRB *no);
 
-//Resseta as rotações da árvore rubro negra
-void resetarRubroNegra(RB *a);
-
 #endif 
