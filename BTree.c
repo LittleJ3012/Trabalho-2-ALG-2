@@ -413,7 +413,7 @@ void imprimeBTree(BTree *arvore){
 }
 
 // Calcula a altura da árvore descendo pelo filho mais a esquerda
-// pois pela propriedade da B Tree, a altura é a mesma para todos os nós
+// pois pelas propriedades da B Tree, a altura é a mesma para todas as folhas
 int calcularAltura(BTree *arvore) {
     int altura = 0;
     noBTree *aux = arvore->raiz;
