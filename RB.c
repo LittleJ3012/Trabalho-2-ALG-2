@@ -1,21 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "RB.h"
-#include "BTree.h"
-
-//Structs da Red Black Tree:
-
-struct noRB{
-    struct noRB *esq;
-    struct noRB *dir;
-    struct noRB *pai;
-    char cor;
-    int chave;
-};
-
-struct RB{
-    struct noRB *sentinela;
-};
 
 //Funções da árvore rubro negra:
 

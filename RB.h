@@ -1,14 +1,24 @@
 #ifndef RB_H
 #define RB_H
 
-#include "BTree.h" 
-
 //===============================//
 // STRUCTS ÁRVORE RUBRO NEGRA    //
 //===============================//
 
 typedef struct noRB noRB;
 typedef struct RB RB;
+
+struct noRB{
+    struct noRB *esq;
+    struct noRB *dir;
+    struct noRB *pai;
+    char cor;
+    int chave;
+};
+
+struct RB{
+    struct noRB *sentinela;
+};
 
 //===============================//
 //     FUNÇÕES ÁRVORE RB        //

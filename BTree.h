@@ -8,6 +8,14 @@
 // Definições das structs para guardar estatísticas sobre as operações na árvore 2-3-4
 typedef struct EstatisticasBTree EstatisticasBTree;
 
+struct EstatisticasBTree {
+    int splits;
+    int merges;
+    int altura;
+    int blocos;
+    int rotacoes;
+    float percentualRemocao;
+};
 
 
 //===============================//
@@ -18,6 +26,17 @@ typedef struct EstatisticasBTree EstatisticasBTree;
 typedef struct noBTree noBTree;
 typedef struct BTree BTree;
 
+struct noBTree {
+    int *chaves;
+    struct noBTree **filhos;
+    struct noBTree *pai;
+    int numChaves;
+    int folha;
+};
+
+struct BTree {
+    noBTree *raiz;
+};
 
 
 //===============================//
@@ -38,10 +57,6 @@ void removeBTree(BTree* arvore, int chave);
 
 // Imprime a B Tree 2-3-4
 void imprimeBTree(BTree *arvore);
-
-// Converte a árvore B em uma árvore rubro negra
-struct RB; // Forward declaration para evitar inclusão circular
-struct RB *converterArvore(BTree *arvore);
 
 
 
@@ -74,10 +89,10 @@ int encontraSucessor(noBTree *no, int indice);
 void mergeFilhos(noBTree *no, int indice);
 
 // Pega uma chave emprestada do irmão anterior
-void pegaEmprestadoDoAnterior(noBTree *no, int indice);
+void rotacionaEsquerda(noBTree *no, int indice);
 
 // Pega uma chave emprestada do próximo irmão
-void pegaEmprestadoDoProximo(noBTree *no, int indice);
+void rotacionaDireita(noBTree *no, int indice);
 
 // Garante que um filho tenha pelo menos 2 chaves antes de descer
 void garanteChavesSuficientes(noBTree *no, int indice);

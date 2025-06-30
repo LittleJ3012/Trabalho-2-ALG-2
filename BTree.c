@@ -9,31 +9,8 @@
 const int GRAU = 3;
 const int ORDEM = 4;
 
-//Struct para as análises estatísticas da árvore 2-3-4
-struct EstatisticasBTree {
-    int splits;
-    int merges;
-    int altura;
-    int blocos;
-    int rotacoes;
-    float percentualRemocao;
-};
-
 // Variável global usada para armazenar métricas
 EstatisticasBTree estatGlobal;
-
-//Structs da B Tree / 2-3-4
-struct noBTree {
-    int *chaves;
-    struct noBTree **filhos;
-    struct noBTree *pai;
-    int numChaves;
-    int folha;
-};
-
-struct BTree {
-    noBTree *raiz;
-};
 
 //Função que aloca uma B Tree
 BTree* alocaBTree() {
@@ -184,8 +161,7 @@ int encontraSucessor(noBTree *no, int indice){
 
 // Faz merge de um filho com seu irmão direito
 void mergeFilhos(noBTree *no, int indice){
-    estatGlobal.merges++;     // Já estava OK
-    estatGlobal.rotacoes++; 
+    estatGlobal.merges++;     
     noBTree *filho = no->filhos[indice];
     noBTree *irmao = no->filhos[indice + 1];
     
@@ -225,7 +201,7 @@ void mergeFilhos(noBTree *no, int indice){
 }
 
 // Pega uma chave emprestada do irmão anterior
-void pegaEmprestadoDoAnterior(noBTree *no, int indice){
+void rotacionaEsquerda(noBTree *no, int indice){
     estatGlobal.rotacoes++;
     noBTree *filho = no->filhos[indice];
     noBTree *irmao = no->filhos[indice - 1];
@@ -257,7 +233,7 @@ void pegaEmprestadoDoAnterior(noBTree *no, int indice){
 }
 
 // Pega uma chave emprestada do próximo irmão
-void pegaEmprestadoDoProximo(noBTree *no, int indice){
+void rotacionaDireita(noBTree *no, int indice){
     estatGlobal.rotacoes++;
     noBTree *filho = no->filhos[indice];
     noBTree *irmao = no->filhos[indice + 1];
@@ -303,9 +279,9 @@ void garanteChavesSuficientes(noBTree *no, int indice){
     
     // Verifica se pode pegar emprestado com algum dos irmãos
     if(indice > 0 && no->filhos[indice - 1]->numChaves >= 2){
-        pegaEmprestadoDoAnterior(no, indice);
+        rotacionaEsquerda(no, indice);
     } else if(indice < no->numChaves && no->filhos[indice + 1]->numChaves >= 2){
-        pegaEmprestadoDoProximo(no, indice);
+        rotacionaDireita(no, indice);
     } else {
         // Se não, faz merge com o irmão da direita se possível, caso contrário, com o da esquerda
         if(indice < no->numChaves){

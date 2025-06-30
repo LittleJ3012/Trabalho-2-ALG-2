@@ -3,6 +3,7 @@
 #include <string.h>
 #include "BTree.h"
 #include "RB.h"
+#include "Conversao.h"
 
 int main(void) {
     int programaRodando = 1;
