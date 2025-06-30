@@ -9,39 +9,52 @@ int main(void) {
     int programaRodando = 1;
 
     while (programaRodando) {
+        
+        //Variáveis necessárias para a função de criar o arquivo:
+        
         int quantidade, semente;
         char nomeArquivo[100];
 
         printf("\n--- GERAR ARQUIVO DE ENTRADA ---\n");
+        
+        //Usuário informa o nome do arquivo que será criado com números inteiros
         printf("Digite o nome do arquivo a ser criado: ");
         scanf("%s", nomeArquivo);
 
+        //Usuário informa o tamanho do arquivo (que será a árvore 2-3-4 original)
         printf("Digite a quantidade de elementos: ");
         scanf("%d", &quantidade);
 
+        //Usuário digita a semente de geração randômica
         printf("Digite a semente de geração randômica: ");
         scanf("%d", &semente);
 
+        //Chamada da função criaArquivo
         criaArquivo(nomeArquivo, quantidade, semente);
 
+        //Chamada da função que realiza a alocação da árvore 2-3-4
         BTree *arvore234 = alocaBTree(2);
         resetarMetricas();
 
+        //Verificação de erros ao abrir o arquivo que foi criado
         FILE *arquivo = fopen(nomeArquivo, "r");
         if (!arquivo) {
             printf("Erro ao abrir o arquivo!\n");
             continue;
         }
 
+        //Insere todos os números do arquivo na árvore 2-3-4
         int valor;
         while (fscanf(arquivo, "%d", &valor) != EOF) {
             insereBTree(arvore234, valor);
         }
         fclose(arquivo);
 
+        //Mensagem de validação
         printf("\n--- Árvore 2-3-4 criada com sucesso! ---\n");
         imprimeBTree(arvore234);
 
+        //Início do menu principal da árvore 2-3-4
         int opMenu1;
         do {
             printf("\n--- MENU ÁRVORE 2-3-4 ---\n");
@@ -73,6 +86,7 @@ int main(void) {
             else if (opMenu1 == 4) {
                 RB *rubroNegra = converterArvore(arvore234);
                 printf("\n--- Árvore Rubro-Negra ---\n");
+                //Imprimindo a árvore rubro negra criada:
                 percorrePreOrdem(rubroNegra, retornaRaizRB(rubroNegra));
 
                 int opcaoRB;
@@ -104,42 +118,52 @@ int main(void) {
                 } while (opcaoRB != 4);
             }
 
-        } while (opMenu1 != 5 && opMenu1 != 6);
+        } while (opMenu1 != 5 && opMenu1 != 6);//Programa continua até que o usuário digite 5 ou 6
 
         // ===========================
         // ANÁLISE ESTATÍSTICA (FINAL)
         // ===========================
 
+        //Chama a função de benchmarking para coletar os dados e salva-los em um arquivo
         printf("\nGerando benchmarking da 2-3-4 com inserções...\n");
-        benchmarkInsercao_BTree(arvore234, quantidade, "estatisticas_insercao.csv");
+        benchmarkInsercao_BTree(arvore234, quantidade, "estatisticas_insercao.txt");
 
+        if(quantidade == 10000){//Realiza a análise estatística da remoção somente em testes
+        //com 10 mil elementos
+            
         printf("\nGerando benchmarking da 2-3-4 com remoções parciais...\n");
-        float percentuaisBTree[] = {10, 20, 35, 50};
+        float percentuaisBTree[] = {10, 20, 35, 50};//Porcentagens que serão utilizdas
 
         int *elementos = (int *)malloc(quantidade * sizeof(int));
         int totalElementos = coletaElementosBTree(arvore234, elementos, quantidade);
 
         for (int i = 0; i < 4; i++) {
             float pct = percentuaisBTree[i];
-            resetarMetricas();
+            resetarMetricas();//Métricas são resetadas para cada porcentagem testada
 
-            BTree *copia = alocaBTree(2);
+            BTree *copia = alocaBTree(2); //Cópia para evitar erros
             for (int j = 0; j < totalElementos; j++) {
                 insereBTree(copia, elementos[j]);
             }
 
+            //Remove um determinado número de elementos da B Tree, de acordo com a porcentagem
+            //fornecida pelo usuário
             int remover = (int)((pct / 100.0f) * totalElementos);
             for (int j = 0; j < remover; j++) {
                 removeBTree(copia, elementos[j]);
             }
 
-            benchmarkRemocao_BTree(copia, pct, "estatisticas_remocao.csv");
+            //Chama a função que guarda as informações sobre as análises estatísticas em 
+            //um arquivo de texto
+            benchmarkRemocao_BTree(copia, pct, "estatisticas_remocao.txt");
         }
 
-        free(elementos);
-
+        free(elementos); //Libera a memória do vetor auxiliar
+    
+        }
+        
         if (opMenu1 == 6) {
-            programaRodando = 0;
+            programaRodando = 0;//Para encerrar o loop while
         }
     }
 
