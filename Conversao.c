@@ -7,6 +7,11 @@ noRB *converterRecursivo(RB *arvoreRB, noBTree *noB) {
         return arvoreRB->sentinela;
     }
 
+    // caso de nó vazio (0 chaves) - retorna sentinela
+    if (noB->numChaves == 0) {
+        return arvoreRB->sentinela;
+    }
+
     noRB *subRaiz; //raiz da subarvore que estamos tratando
 
     if (noB->numChaves == 1) { // se só tem 1 chave
