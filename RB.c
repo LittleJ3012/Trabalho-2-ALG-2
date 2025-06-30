@@ -15,8 +15,6 @@ struct noRB{
 
 struct RB{
     struct noRB *sentinela;
-    int rotacoesEsq;
-    int rotacoesDir;
 };
 
 //Funções da árvore rubro negra:
@@ -320,7 +318,6 @@ void balanceaRemocao(RB *a, noRB *y, noRB *pai) {
 
 //Realiza uma rotação à esquerda
 void rotacaoEsquerda(RB *a, noRB *noDesbalanceado){
-    a->rotacoesEsq++;
     noRB *x = noDesbalanceado->dir;
     noDesbalanceado->dir = x->esq;
     
@@ -342,7 +339,6 @@ void rotacaoEsquerda(RB *a, noRB *noDesbalanceado){
 
 //Realiza uma rotação à direita
 void rotacaoDireita(RB *a, noRB *noDesbalanceado){
-    a->rotacoesDir++;
     noRB *y = noDesbalanceado->esq;
     noDesbalanceado->esq = y->dir;
     
@@ -384,10 +380,4 @@ int alturaRB(RB *a, noRB *no) {
     }
 
     return 1 + maiorAltura;
-}
-
-
-void resetarRubroNegra(RB *a) {
-    a->rotacoesEsq = 0;
-    a->rotacoesDir = 0;
 }
