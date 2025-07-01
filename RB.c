@@ -107,6 +107,7 @@ int removeArvoreRB(RB *a, int chave){
     noRB *noRemovido = atual;
     noRB *filho;
     noRB *paiRemovido = atual->pai;
+    char corOriginal = atual->cor;
 
     if(atual->esq != a->sentinela && atual->dir != a->sentinela){
         noRB *sucessor = atual->dir;
@@ -118,6 +119,7 @@ int removeArvoreRB(RB *a, int chave){
 
         noRemovido = sucessor;
         paiRemovido = sucessor->pai;
+        corOriginal = sucessor->cor;
     }
 
     if(noRemovido->esq != a->sentinela){
@@ -138,7 +140,11 @@ int removeArvoreRB(RB *a, int chave){
         noRemovido->pai->dir = filho; //Filho da direita
     }
 
-    balanceaRemocao(a, filho, paiRemovido);
+    // Só faz balanceamento se removeu um nó preto
+    if(corOriginal == 'P'){
+        balanceaRemocao(a, filho, paiRemovido);
+    }
+    
     free(noRemovido);
 
     return 1; 
@@ -213,7 +219,7 @@ void balanceaInsercao(RB *a, noRB *z){
 
 //Realiza o balanceamento após uma remoção
 void balanceaRemocao(RB *a, noRB *y, noRB *pai) {
-    while (y != a->sentinela && y->cor == 'P') {
+    while (y != a->sentinela->esq && y->cor == 'P') {
         if (y == pai->esq) {
             // Irmão à direita
             noRB *w = pai->dir;
@@ -230,7 +236,8 @@ void balanceaRemocao(RB *a, noRB *y, noRB *pai) {
             if ((w->esq == a->sentinela || w->esq->cor == 'P') &&
                 (w->dir == a->sentinela || w->dir->cor == 'P')) {
                 w->cor = 'V';
-                y = y->pai;
+                y = pai;
+                pai = y->pai;
             }
             // Caso 3: irmão preto com filho esquerdo vermelho e direito preto
             else if (w->dir == a->sentinela || w->dir->cor == 'P') {
@@ -240,17 +247,15 @@ void balanceaRemocao(RB *a, noRB *y, noRB *pai) {
                 rotacaoDireita(a, w);
                 w = pai->dir;
             }
-
             // Caso 4: irmão preto com filho direito vermelho
-            if (w != a->sentinela) {
+            else if (w != a->sentinela) {
                 w->cor = pai->cor;
                 pai->cor = 'P';
                 if (w->dir != a->sentinela)
                     w->dir->cor = 'P';
                 rotacaoEsquerda(a, pai);
+                y = a->sentinela->esq; // termina o loop
             }
-
-            y = a->sentinela; // termina o loop
             
         } else {
             // Irmão à esquerda
@@ -279,17 +284,15 @@ void balanceaRemocao(RB *a, noRB *y, noRB *pai) {
                 rotacaoEsquerda(a, w);
                 w = pai->esq;
             }
-
             // Caso 4: irmão preto com filho esquerdo vermelho
-            if (w != a->sentinela) {
+            else if (w != a->sentinela) {
                 w->cor = pai->cor;
                 pai->cor = 'P';
                 if (w->esq != a->sentinela)
                     w->esq->cor = 'P';
                 rotacaoDireita(a, pai);
+                y = a->sentinela->esq; // termina o loop
             }
-
-            y = a->sentinela; // termina o loop
         }
     }
 
