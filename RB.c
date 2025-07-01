@@ -229,11 +229,9 @@ void balanceaRemocao(RB *a, noRB *y, noRB *pai) {
                 w->cor = 'P';
                 pai->cor = 'V';
                 rotacaoEsquerda(a, pai);
-                w = pai->dir;
             }
-
             // Caso 2: irmão e filhos pretos
-            if ((w->esq == a->sentinela || w->esq->cor == 'P') &&
+            else if ((w->esq == a->sentinela || w->esq->cor == 'P') &&
                 (w->dir == a->sentinela || w->dir->cor == 'P')) {
                 w->cor = 'V';
                 y = pai;
@@ -245,7 +243,6 @@ void balanceaRemocao(RB *a, noRB *y, noRB *pai) {
                     w->esq->cor = 'P';
                 w->cor = 'V';
                 rotacaoDireita(a, w);
-                w = pai->dir;
             }
             // Caso 4: irmão preto com filho direito vermelho
             else if (w != a->sentinela) {
@@ -266,11 +263,9 @@ void balanceaRemocao(RB *a, noRB *y, noRB *pai) {
                 w->cor = 'P';
                 pai->cor = 'V';
                 rotacaoDireita(a, pai);
-                w = pai->esq;
             }
-
             // Caso 2: irmão e filhos pretos
-            if ((w->esq == a->sentinela || w->esq->cor == 'P') &&
+            else if ((w->esq == a->sentinela || w->esq->cor == 'P') &&
                 (w->dir == a->sentinela || w->dir->cor == 'P')) {
                 w->cor = 'V';
                 y = pai;
@@ -282,7 +277,6 @@ void balanceaRemocao(RB *a, noRB *y, noRB *pai) {
                     w->dir->cor = 'P';
                 w->cor = 'V';
                 rotacaoEsquerda(a, w);
-                w = pai->esq;
             }
             // Caso 4: irmão preto com filho esquerdo vermelho
             else if (w != a->sentinela) {
