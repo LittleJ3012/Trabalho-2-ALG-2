@@ -142,42 +142,52 @@ int main(void) {
         // ===========================
 
         //Chama a função de benchmarking para coletar os dados e salva-los em um arquivo
-        //printf("\nGerando benchmarking da 2-3-4 com inserções...\n");
-        //benchmarkInsercao_BTree(arvore234, quantidade, "estatisticas_insercao.txt");
+        printf("\nGerando benchmarking da 2-3-4 com inserções...\n");
+        benchmarkInsercao_BTree(arvore234, quantidade, "estatisticas_insercao.txt");
 
-        //if(quantidade == 10000){//Realiza a análise estatística da remoção somente em testes
+        if(quantidade == 10000){//Realiza a análise estatística da remoção somente em testes
         //com 10 mil elementos
             
-        //printf("\nGerando benchmarking da 2-3-4 com remoções parciais...\n");
-        //float percentuaisBTree[] = {10, 20, 35, 50};//Porcentagens que serão utilizdas
+        printf("\nGerando benchmarking da 2-3-4 com remoções parciais...\n");
+        float percentuaisBTree[] = {10, 20, 35, 50};//Porcentagens que serão utilizdas
 
-        //int *elementos = (int *)malloc(quantidade * sizeof(int));
-        //int totalElementos = coletaElementosBTree(arvore234, elementos, quantidade);
+        int *elementos = (int *)malloc(quantidade * sizeof(int));
+        int totalElementos = coletaElementosBTree(arvore234, elementos, quantidade);
 
-        //for (int i = 0; i < 4; i++) {
-            //float pct = percentuaisBTree[i];
-            //resetarMetricas();//Métricas são resetadas para cada porcentagem testada
+        for (int i = 0; i < 4; i++) {
+            float pct = percentuaisBTree[i];
+            resetarMetricas();//Métricas são resetadas para cada porcentagem testada
 
-            //BTree *copia = alocaBTree(2); //Cópia para evitar erros
-            //for (int j = 0; j < totalElementos; j++) {
-                //insereBTree(copia, elementos[j]);
-            //}
+            BTree *copia = alocaBTree(2); //Cópia para evitar erros
+            for (int j = 0; j < totalElementos; j++) {
+                insereBTree(copia, elementos[j]);
+            }
 
             //Remove um determinado número de elementos da B Tree, de acordo com a porcentagem
             //fornecida pelo usuário
-            //int remover = (int)((pct / 100.0f) * totalElementos);
-            //for (int j = 0; j < remover; j++) {
-                //removeBTree(copia, elementos[j]);
-            //}
+            int remover = (int)((pct / 100.0f) * totalElementos);
+            
+            // Embaralha os elementos para remoção aleatória
+            for (int j = totalElementos - 1; j > 0; j--) {
+                int k = rand() % (j + 1);
+                int temp = elementos[j];
+                elementos[j] = elementos[k];
+                elementos[k] = temp;
+            }
+
+            // Remove os primeiros 'remover' elementos embaralhados
+            for (int j = 0; j < remover; j++) {
+                removeBTree(copia, elementos[j]);
+            }
 
             //Chama a função que guarda as informações sobre as análises estatísticas em 
             //um arquivo de texto
-            //benchmarkRemocao_BTree(copia, pct, "estatisticas_remocao.txt");
-        //}
+            benchmarkRemocao_BTree(copia, pct, "estatisticas_remocao.txt");
+        }
 
-        //free(elementos); //Libera a memória do vetor auxiliar
+        free(elementos); //Libera a memória do vetor auxiliar
     
-        //}
+        }
         
         programaRodando = 0;//Para encerrar o loop while
     }
