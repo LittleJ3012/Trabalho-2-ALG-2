@@ -521,7 +521,7 @@ int criaArquivo(char *nomeArquivo, int qtd, int semente){
     srand(semente);
     
     for(int i=0; i< qtd; i++){
-        num = rand() % 1000;
+        num = rand() % 100000;
         fprintf(arq, "%d\n", num);
     }
     
