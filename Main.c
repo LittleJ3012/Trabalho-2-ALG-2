@@ -175,7 +175,7 @@ int main(void) {
                 elementos[k] = temp;
             }
 
-            // Remove os primeiros 'remover' elementos embaralhados
+            // Remove os primeiros elementos embaralhados
             for (int j = 0; j < remover; j++) {
                 removeBTree(copia, elementos[j]);
             }
