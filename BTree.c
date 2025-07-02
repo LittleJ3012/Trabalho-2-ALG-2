@@ -30,29 +30,31 @@ noBTree* criaNoBTree(int folha) {
     }
     no->folha = folha;
     no->chaves = malloc(GRAU * sizeof(int));
-    no->filhos = malloc((GRAU + 1) * sizeof(noBTree *));
+    no->filhos = malloc(ORDEM * sizeof(noBTree *));
     no->numChaves = 0;
     no->pai = NULL;
     
-    for (int i = 0; i <= GRAU; i++) {
+    for (int i = 0; i < ORDEM; i++) {
         no->filhos[i] = NULL;
     }
     
     return no;
 }
 
-// Realiza o split de um filho cheio e indice = indiceFilho
+// Realiza o split de um filho cheio com indice = indiceFilho
+// A chave do meio do filho será inserida no pai e o filho será dividido em dois
 void splitNoBTree(noBTree *pai, int indiceFilho){
     estatGlobal.splits++;//Para contabilizar os splits
     
+    // Cria o novo nó que terá a chave da direita do nó filho
     noBTree *filho = pai->filhos[indiceFilho];
     noBTree *novoNo = criaNoBTree(filho->folha);
     novoNo->numChaves = 1;
     novoNo->pai = pai;
-
     novoNo->chaves[0] = filho->chaves[2];
+
     if(!filho->folha){
-        // Copia os filhos da direita para o novo nó
+        // Copia os netos da direita para o novo nó
         novoNo->filhos[0] = filho->filhos[2];
         novoNo->filhos[1] = filho->filhos[3];
         if (novoNo->filhos[0] != NULL) {
@@ -62,16 +64,19 @@ void splitNoBTree(noBTree *pai, int indiceFilho){
             novoNo->filhos[1]->pai = novoNo;
         }
     }
+    // Após o split, mantem apenas a chave da esquerda no filho original
     filho->numChaves = 1;
 
-    // Desloca os filhos para a direita para abrir espaço para o novo nó
+    // Desloca para direita os filhos que estão à direita do
+    // filho original para abrir espaço para o novo nó
     int i = 0;
     for(i=pai->numChaves; i>indiceFilho; i--){
         pai->filhos[i+1] = pai->filhos[i];
     }
+    // Insere o novo nó à direita do filho original
     pai->filhos[indiceFilho+1] = novoNo;
     
-    // Desloca as chaves para a direita e insere a nova chave
+    // Desloca as chaves do pai para a direita e insere a nova chave
     for(i=pai->numChaves-1; i>=indiceFilho; i--){
         pai->chaves[i+1] = pai->chaves[i];
     }
